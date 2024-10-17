@@ -5,6 +5,7 @@ import { checkWinner } from './utils/checkWinner'
 import { TURNS } from './constants' 
 import './App.css'
 import { WinnerModalComponent } from './component/WinnerModal'
+import { removeLocalStorage, saveLocalStorage } from './utils/managerLocalStorage'
 
 
 
@@ -19,7 +20,7 @@ function App() {
   const [turn, setTurn] = useState(() => {
     const turnFromLocalStorage = window.localStorage.getItem('turn')
     //return turnFromLocalStorage ? turnFromLocalStorage : TURNS.X
-    return turnFromLocalStorage ?? TURNS.X
+    return JSON.parse(turnFromLocalStorage)  ?? TURNS.X
   })
   const [winner, setWinner] = useState(null) // null no hay ganador false es empate y true existe el ganador
 
@@ -38,9 +39,9 @@ function App() {
     const  newTurn = turn === TURNS.X? TURNS.O: TURNS.X
     setTurn(newTurn)
     // save partida 
-    window.localStorage.setItem('board', JSON.stringify(newBoard))
-    window.localStorage.setItem('turn', JSON.stringify(newTurn))
-
+    //window.localStorage.setItem('board', JSON.stringify(newBoard))
+    //window.localStorage.setItem('turn', JSON.stringify(newTurn))
+    saveLocalStorage(newTurn,newBoard)
     const newwinner = checkWinner(newBoard)
 
     if(newwinner) {
@@ -52,8 +53,9 @@ function App() {
   }
 
 const resetGame = () => {
-  window.localStorage.removeItem('board')
-  window.localStorage.removeItem('turn')
+  //window.localStorage.removeItem('board')
+  //window.localStorage.removeItem('turn')
+  removeLocalStorage()
   setBoard(initialBoard)
   setWinner(null)
   setTurn(TURNS.X)
