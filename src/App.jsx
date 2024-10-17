@@ -9,10 +9,20 @@ import { WinnerModalComponent } from './component/WinnerModal'
 
 
 function App() {
+
   const initialBoard = Array(9).fill(null)
-  const [board, setBoard] = useState(initialBoard)
-  const [turn, setTurn] = useState(TURNS.X)
+  const [board, setBoard] = useState(() =>{
+    const boardFromLocalStorage = window.localStorage.getItem('board')
+    return boardFromLocalStorage ? JSON.parse(boardFromLocalStorage) : initialBoard
+  })
+
+  const [turn, setTurn] = useState(() => {
+    const turnFromLocalStorage = window.localStorage.getItem('turn')
+    //return turnFromLocalStorage ? turnFromLocalStorage : TURNS.X
+    return turnFromLocalStorage ?? TURNS.X
+  })
   const [winner, setWinner] = useState(null) // null no hay ganador false es empate y true existe el ganador
+
 
 
 
@@ -27,20 +37,28 @@ function App() {
     setBoard(newBoard)
     const  newTurn = turn === TURNS.X? TURNS.O: TURNS.X
     setTurn(newTurn)
+    // save partida 
+    window.localStorage.setItem('board', JSON.stringify(newBoard))
+    window.localStorage.setItem('turn', JSON.stringify(newTurn))
+
     const newwinner = checkWinner(newBoard)
 
     if(newwinner) {
-      setWinner(newwinner)
       confetti()
+      setWinner(newwinner)
     } else if(checkEndGame(newBoard)){
       setWinner(false)
     }
   }
 
 const resetGame = () => {
+  window.localStorage.removeItem('board')
+  window.localStorage.removeItem('turn')
   setBoard(initialBoard)
   setWinner(null)
   setTurn(TURNS.X)
+  
+
 }
   return (
     <>
@@ -67,8 +85,7 @@ const resetGame = () => {
               {TURNS.O}
           </Square>
         </section>
-       
-           <WinnerModalComponent winner={winner} resetGame={resetGame}/>
+        <WinnerModalComponent winner={winner} resetGame={resetGame}/>
          
       </main>
       
